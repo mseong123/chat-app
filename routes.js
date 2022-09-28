@@ -15,7 +15,7 @@ function ensureAuthenticated(req, res, next) {
 // Be sure to change the title
 app.route('/').get((req, res) => {
     // Change the response to render the Pug template
-    res.render('pug', { title: 'Connected to Database', message: 'Please login', showLogin: true, showRegistration: true });
+    res.render('pug', { title: 'Connected to Database', message: 'Please login', showLogin: true, showRegistration: true, showSocialAuth: true });
   });
   app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
     res.redirect('/profile');
@@ -23,6 +23,12 @@ app.route('/').get((req, res) => {
   app.route('/profile').get(ensureAuthenticated, (req, res) => {
     res.render(process.cwd() + '/views/pug/profile', { username: req.user.username });
   });
+
+  app.route('/auth/github').get(passport.authenticate('github'));
+  app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  });
+
   app.route('/logout').get((req, res) => {
     req.logout();
     res.redirect('/');
